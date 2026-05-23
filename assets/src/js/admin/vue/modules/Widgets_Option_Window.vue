@@ -199,15 +199,22 @@ export default {
       let selected_widgets = this.localSelectedWidgets;
 
       // Create a new object that maintains the order of selected_widgets
-      let widgets_list = selected_widgets.reduce((obj, widget_name) => {
-        // Find the widget by its widget_name in availableWidgets
-        const widget = Object.values(availableWidgets).find(
-          (w) => w.widget_name === widget_name,
-        );
+      let widgets_list = selected_widgets.reduce((obj, widget_key) => {
+        // Resolve dynamic widgets by their exact widget key first.
+        // This preserves multiple instances of the same base widget, such as
+        // dhotels-number, dhotels-number_2, dhotels-number_3.
+        const widget =
+          availableWidgets[widget_key] ||
+          Object.values(availableWidgets).find(
+            (w) => w.widget_key === widget_key,
+          ) ||
+          Object.values(availableWidgets).find(
+            (w) => w.widget_name === widget_key,
+          );
 
         // If the widget is found, add it to the object
         if (widget) {
-          obj[widget_name] = widget;
+          obj[widget_key] = widget;
         }
 
         return obj;

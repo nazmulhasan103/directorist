@@ -10371,15 +10371,19 @@ function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t =
       var selected_widgets = this.localSelectedWidgets;
 
       // Create a new object that maintains the order of selected_widgets
-      var widgets_list = selected_widgets.reduce(function (obj, widget_name) {
-        // Find the widget by its widget_name in availableWidgets
-        var widget = Object.values(availableWidgets).find(function (w) {
-          return w.widget_name === widget_name;
+      var widgets_list = selected_widgets.reduce(function (obj, widget_key) {
+        // Resolve dynamic widgets by their exact widget key first.
+        // This preserves multiple instances of the same base widget, such as
+        // dhotels-number, dhotels-number_2, dhotels-number_3.
+        var widget = availableWidgets[widget_key] || Object.values(availableWidgets).find(function (w) {
+          return w.widget_key === widget_key;
+        }) || Object.values(availableWidgets).find(function (w) {
+          return w.widget_name === widget_key;
         });
 
         // If the widget is found, add it to the object
         if (widget) {
-          obj[widget_name] = widget;
+          obj[widget_key] = widget;
         }
         return obj;
       }, {});
